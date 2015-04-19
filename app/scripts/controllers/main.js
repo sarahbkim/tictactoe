@@ -13,6 +13,8 @@ angular.module('tictactoeApp')
     $scope.filled = 0;
     $scope.player = '';
     $scope.board = [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']];
+    $scope.winner;
+    $scope.gameOver = false;
 
     // --- start private methods 
     var checkRow = function(board, x, y, player) {
@@ -33,6 +35,7 @@ angular.module('tictactoeApp')
         return true;
     }
 
+    // this doesn't actually check correctly!!! 
     var checkDiag = function(board, x, y, player) {
         // check if in the middle
         if(x > 0 && x < board.length-1 && y>0 && y<board[x].length-1) {
@@ -47,41 +50,41 @@ angular.module('tictactoeApp')
         return true;
     }
 
-    var game_over_check = function(x, y, player) {
+    var gameOverCheck = function(x, y, player) {
         // check if there are no more spaces in game
         if($scope.filled==9) {
-            console.log("Game over: no more boxes to fill!" + $scope.filled)
-            return true;
+            $scope.gameOver = true;
+            $scope.winner = "None";
         }
         var test1 = checkRow($scope.board, x, y, player);
         var test2 = checkCol($scope.board, x, y, player);
         var test3 = checkDiag($scope.board, x, y, player);
 
         if(test1 || test2 || test3) {
-            return true;
+            $scope.gameOver = true;
         } else {
-            return false;
+            $scope.gameOver = false;
         }
     }
 
     // update the board
-    var update_board = function(x, y) {
+    var updateBoard = function(x, y) {
         // update the board 
-        update_player();
         $scope.board[x][y] =  $scope.player;
         $scope.filled++;
         var id = String(x) + String(y);
         changeTile(id, $scope.player);
         
         // evaluate the board for winner
-        if(game_over_check(x, y, $scope.player)) {
-            console.log("Winner is: ", $scope.player);
-        } else {
-            console.log("Make the next move please...");
+        gameOverCheck(x, y, $scope.player);
+
+        if($scope.gameOver) {
+            $scope.winner = $scope.winner || $scope.player; // this doesn't account for ties
         }
+        
     }
 
-    var update_player = function() {
+    var updatePlayer = function() {
         // new game -- start with o
         if($scope.player=='') {
             $scope.player = 'o';
@@ -101,6 +104,7 @@ angular.module('tictactoeApp')
 
     var changeTile = function(id, player) {
         var $currentTile = $(".tile#" + id)
+        console.log($currentTile);
         $currentTile.addClass("player_" + player);
     }
 
@@ -115,12 +119,16 @@ angular.module('tictactoeApp')
             console.log("not a valid position");
         } else if ($scope.board[x][y]!=' ') {
             console.log("not a valid position - marked already!");
-        } 
-        if(game_over_check(x, y, $scope.player)==false) {    
-            update_board(x, y);
         }
-    }
 
+        if(!$scope.gameOver) {
+            updatePlayer();
+            updateBoard(x, y);
+        } else {
+            console.log("don't update")
+        }
+        
+    }
 
 
 });
