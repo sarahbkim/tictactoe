@@ -1,6 +1,10 @@
 $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/bootstrap/";
 // bower:scss
+@import "bootstrap-sass-official/assets/stylesheets/_bootstrap.scss";
 // endbower
+
+$tileFont: "Arimo", sans-serif;
+$cloudColor: #ecf0f1;
 
 .browsehappy {
   margin: 0.2em 0;
@@ -47,23 +51,33 @@ body {
 }
 
 /* Main marketing message and sign up button */
-.jumbotron {
+.gameSection {
+  height: 100%;
+  overflow: auto;
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
-
-  .btn {
-    font-size: 21px;
-    padding: 14px 24px;
+  padding-bottom: 30px;
+  .tileRow {
+    float: left;
   }
+  .tile {
+    background-color: $cloudColor;
+    height: 120px;
+    width: 120px;
+    border: 4px solid #fff;
+    font-family: $tileFont;
+    font-size: 80px;
+    font-weight: 700;
+  }
+  
 }
 
-/* Supporting marketing content */
-.marketing {
-  margin: 40px 0;
+.player_o {
+  background-color: red !important;
+}
 
-  p + h4 {
-    margin-top: 28px;
-  }
+.player_x {
+  background-color: blue !important;
 }
 
 /* Responsive: Portrait tablets and up */

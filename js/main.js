@@ -71,7 +71,6 @@ var ticTacToe = function() {
 
     }
 
-    
     // update the board
     var update_board = function(x, y) {
         board[x][y] =  player;
@@ -90,6 +89,8 @@ var ticTacToe = function() {
             player='x'
         }
     }
+
+    
     var view_board = function() {
             var b = "";
             for(var i=0;i<board.length;i++) {
