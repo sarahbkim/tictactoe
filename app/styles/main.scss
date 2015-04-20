@@ -73,11 +73,46 @@ body {
 }
 
 .player_o {
-  background-color: red !important;
+  /*border-radius: 50%;*/
+  width: 80%;
+  height: 80%;
+  background-color: #e74c3c;
+  float: center;
+  position: relative;
+  margin: 10px;
+  &:after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    content: "\25CB";
+    font-size: 120px;
+    color: $cloudColor;
+    line-height: 90px;
+    text-align: center;
+  }
 }
 
 .player_x {
-  background-color: blue !important;
+  background-color: #2980b9;
+  width: 80%;
+  height: 80%;
+  margin: 10px;
+  float: center;
+  position: relative;
+  &:after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    content: "\d7";
+    font-size: 100px;
+    color: $cloudColor;
+    line-height: 95px;
+    text-align: center;
+  }
 }
 
 /* Responsive: Portrait tablets and up */

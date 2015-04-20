@@ -2,6 +2,7 @@
   <div ng-repeat="i in board track by $index" class="col-md-10 col-md-offset-2">
     <div ng-repeat="t in i track by $index" class="tileRow">
       <div ng-click="play({{$parent.$index}}, {{$index}})" class="tile" id="{{$parent.$index}}{{$index}}">
+        <div class="innerTile"><div></div></div>
       </div>
     </div>
   </div>

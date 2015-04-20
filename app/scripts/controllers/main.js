@@ -8,7 +8,8 @@
  * Controller of the tictactoeApp
  */
 angular.module('tictactoeApp')
-  .controller('MainCtrl', function ($scope) {
+  .controller('MainCtrl', ['$scope' , function ($scope) {
+
     // on load, generate a 9-tiled board
     $scope.filled = 0;
     $scope.player = '';
@@ -37,17 +38,17 @@ angular.module('tictactoeApp')
 
     // this doesn't actually check correctly!!! 
     var checkDiag = function(board, x, y, player) {
-        // check if in the middle
-        if(x > 0 && x < board.length-1 && y>0 && y<board[x].length-1) {
-            if((board[x-1][y+1] != player) && (board[x+1][y-1] != player)) {
-                return false;
-            } else if((board[x-1][y-1] != player) && (board[x+1][y+1] != player)) {
-                return false;
+        if(board[0][0] != ' ') {
+            if(board[0][0]== player && board[1][1] == player && board[2][2] == player) {
+                return true;
+            }
+        } else if (board[0][2] != ' ') {
+            if(board[0][2] == player && board[1][1] == player && board[2][0] == player) {
+                return true;
             }
         } else {
             return false;
         }
-        return true;
     }
 
     var gameOverCheck = function(x, y, player) {
@@ -103,8 +104,7 @@ angular.module('tictactoeApp')
     }
 
     var changeTile = function(id, player) {
-        var $currentTile = $(".tile#" + id)
-        console.log($currentTile);
+        var $currentTile = $(".tile#" + id + " div");
         $currentTile.addClass("player_" + player);
     }
 
@@ -119,16 +119,16 @@ angular.module('tictactoeApp')
             console.log("not a valid position");
         } else if ($scope.board[x][y]!=' ') {
             console.log("not a valid position - marked already!");
-        }
-
-        if(!$scope.gameOver) {
-            updatePlayer();
-            updateBoard(x, y);
         } else {
-            console.log("don't update")
+            if(!$scope.gameOver) {
+                updatePlayer();
+                updateBoard(x, y);
+            } else {
+                console.log("don't update")
+            }    
         }
         
-    }
+    };
 
 
-});
+}]);
