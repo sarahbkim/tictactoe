@@ -108,20 +108,21 @@ angular.module('tictactoeApp')
     }
 
     $scope.play = function(x, y) {
-        // return error if player chooses number not in the index
-        if( x< 0 || x > $scope.board[0].length-1) {
-            throw new Error('not a valid position');
-        } else if (y < 0 || y > $scope.board.length-1) {
-            throw new Error('not a valid position');
-        } else if ( $scope.board[x][y]!=' ') {
-            throw new Error('not a valid position - marked already!');
-        } else {
-            if(!$scope.gameOver) {
+        // check if game over ... 
+        if(!$scope.gameOver) {
+            // return error if player chooses number not in the index    
+            if( x< 0 || x > $scope.board[0].length-1) {
+                throw new Error('not a valid position');
+            } else if (y < 0 || y > $scope.board.length-1) {
+                throw new Error('not a valid position');
+            } else if ( $scope.board[x][y]!=' ') {
+                throw new Error('not a valid position - marked already!');
+            } else {
                 $scope.updatePlayer();
                 $scope.updateBoard(x, y);
-            } else {
-                throw new Error('dont update');
-            }    
+            }
+        } else {
+            throw new Error('dont update');
         }
         
     };

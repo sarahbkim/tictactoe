@@ -57,7 +57,7 @@ describe('Controller: MainCtrl', function () {
       
       expect(function() {
         scope.play(2, 2);
-      }).toThrow(new Error('not a valid position - marked already!'));
+      }).toThrow(new Error('dont update'));
 
     });
 
@@ -70,8 +70,76 @@ describe('Controller: MainCtrl', function () {
       expect(function() {
         scope.play(-3, 4);
       }).toThrowError('not a valid position');
-      
+
     });
 
   })
+
+  describe('MainCtrl.resetBoard', function() {
+    it('should reset the board to empty when called', function() {
+      scope.play(0, 2);
+      scope.resetBoard();
+      expect(scope.board).toEqual(emptyBoard);
+    });
+  });
+
+  describe('MainCtrl.checkRow', function() {
+    beforeEach(function() {
+      scope.play(0, 1);
+      scope.play(2, 2);
+      scope.play(0, 2);
+      scope.play(2, 1);
+      
+    });
+
+    it('should return true when row has winner', function() {
+      scope.play(0, 0);
+      expect(scope.checkRow(scope.board, 0, 0, 'x')).toEqual(true);
+    });
+
+    it('should return false when row is not yet filled', function() {
+      expect(scope.checkRow(scope.board, 2, 1, 'o')).toEqual(false);
+    });
+
+    it('should return false when row has no winner', function() {
+      scope.play(1, 1);
+      scope.play(0, 0);
+      expect(scope.checkRow(scope.board, 2, 1, 'o')).toEqual(false);
+    });
+  });
+
+  describe('MainCtrl.checkCol', function() {
+    beforeEach(function() {
+      scope.play(0, 0);
+      scope.play(0, 1);
+      scope.play(1, 0);
+      scope.play(2, 2);
+    });
+
+    it('should return false if col is not yet filled', function() {
+      expect(scope.checkCol(scope.board, 2, 2, scope.player)).toEqual(false);
+    });
+
+    it('should return true when col has a winner', function() {
+      scope.play(2, 0);
+      expect(scope.checkCol(scope.board, 2, 0, scope.player)).toEqual(true);
+    });
+
+  });
+
+  describe('MainCtrl.checkDiag', function() {
+    beforeEach(function() {
+      scope.play(0, 0);
+      scope.play(0, 2);
+      scope.play(1, 1);
+      scope.play(1, 2);
+    });
+
+    it('should return true when diag has a winner', function() {
+      scope.play(2, 2);
+      expect(scope.checkDiag(scope.board, 2, 2, scope.player)).toEqual(true);
+    });
+
+  });
+
 });
