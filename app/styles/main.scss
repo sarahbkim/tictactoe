@@ -74,12 +74,11 @@ body {
 
 .player_o {
   /*border-radius: 50%;*/
-  width: 80%;
-  height: 80%;
+  width: 100%;
+  height: 100%;
   background-color: #e74c3c;
   float: center;
   position: relative;
-  margin: 10px;
   &:after {
     position: absolute;
     top: 0;
@@ -87,18 +86,17 @@ body {
     left: 0;
     right: 0;
     content: "\25CB";
-    font-size: 120px;
+    font-size: 135px;
     color: $cloudColor;
-    line-height: 90px;
+    line-height: 110px;
     text-align: center;
   }
 }
 
 .player_x {
   background-color: #2980b9;
-  width: 80%;
-  height: 80%;
-  margin: 10px;
+  width: 100%;
+  height: 100%;
   float: center;
   position: relative;
   &:after {
@@ -110,7 +108,7 @@ body {
     content: "\d7";
     font-size: 100px;
     color: $cloudColor;
-    line-height: 95px;
+    line-height: 110px;
     text-align: center;
   }
 }
