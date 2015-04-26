@@ -136,40 +136,47 @@ angular.module('tictactoeApp')
         myBest: {}, // var best = {'score': undefined, 'move': undefined};
         reply: {},
         board: [],
-        side: 'COMPUTER',
-        chooseMove : function(side) {
+        side: 'COMPUTER', // start with computer -- go to 'HUMAN' next... 
+        chooseMove : function() {
             // check if game over
-            if($scope.gameOver) {
-                return myBest;
+            if(this.gameOver()) {
+                return this.myBest;
             }
 
-            if(side=='COMPUTER') {
-                myBest.score = -2;
+            if(this.side=='COMPUTER') {
+                this.myBest.score = -2;
             } else {
-                myBest.score = 2;
+                this.myBest.score = 2;
             }
 
             var moves = legalMoves(board);
 
             for(var i=0;i<moves.length;i++) {
-                performMove(moves[i]);
-                reply = chooseMove(!side);
-                undoMove(moves[i]);
-                if(((side=='COMPUTER') && (reply.score > myBest.score)) || ((side=='HUMAN') && (reply.score < myBest.score))) {
-                    myBest.move = m;
-                    myBest.score = reply.score;
+                this.performMove(moves[i]);
+                this.reply = this.chooseMove(not(this.side));
+                this.undoMove(moves[i]);
+                if(((this.side=='COMPUTER') && (this.reply.score > this.myBest.score)) || ((this.side=='HUMAN') && (this.reply.score < this.myBest.score))) {
+                    this.myBest.move = moves[i];
+                    this.myBest.score = this.reply.score;
                 }
             }
             // return best move and score
-            return myBest; 
+            return this.myBest; 
         },
+        not: function(side) {
+            if(side=='COMPUTER') {
+                this.side == 'HUMAN';
+            } else {
+                this.side == 'COMPUTER';
+            }
+        }
         performMove: function(move)
             // runs a move that modifies 'this' grid
             // and updates the score for myBest or reply variables.... 
             // @param: move, an array of length 2 [x, y] coordinates of the board
             // evaluates the board 
             this.board[move[0]][move[1]] = side;
-            evaluateBoard(this.board, move);
+            this.evaluateBoard(this.board, move);
         },
         undoMove: function(move) {
             // undoes the move so that it restores 'this' grid
@@ -201,7 +208,7 @@ angular.module('tictactoeApp')
             var boardTest = {
                 checkRow: function() {
                     for(var i=0;i<self.board[this.x].length;i++) {
-                        if(board[this.x][i]!=this.startPlayer) {
+                        if(self.board[this.x][i]!=this.startPlayer) {
                             return false;
                         }
                     }
@@ -209,7 +216,7 @@ angular.module('tictactoeApp')
                 },
                 checkCol: function() {
                     for(var i=0;i<self.board.length;i++) {
-                        if(board[i][this.y]!=startPlayer) {
+                        if(self.board[i][this.y]!=this.startPlayer) {
                             return false;
                         }
                     }
@@ -227,22 +234,27 @@ angular.module('tictactoeApp')
                     } else {
                         return false;
                     }
-
                 }
-            };
-            // end boardTest inner obj
+            }; // end boardTest object
 
-            // do checks here... 
-            // if board is full with no winner, return draw 
-                self.myBest.score = 0; // what about 'reply?'
-            // return winner if found
-                self.myBest.score = 1;
-            // otherwise, don't change the best score
-
+            // run the board tests and update the scores depending on side..
+            if(this.boardTest.checkRow() || this.boardTest.checkCol() || this.boardTest.checkDiag() ) {
+                if(self.side=='COMPUTER') {
+                    self.myBest.score = self.COMPUTER_WIN;
+                } else {
+                    self.reply.score = self.HUMAN_WIN;
+                }
+            } else {
+                if(self.side=='COMPUTER') {
+                    self.myBest.score = self.DRAW;
+                } else {
+                    self.reply.score = self.DRAW;
+                }
             }
-        }
 
-    }
+        } // end evaluateBoard() 
+
+    } // end $scope.miniMax object
 
 
 }]);
