@@ -169,8 +169,8 @@ angular.module('tictactoeApp')
             } else {
                 this.side == 'COMPUTER';
             }
-        }
-        performMove: function(move)
+        },
+        performMove: function(move) {
             // runs a move that modifies 'this' grid
             // and updates the score for myBest or reply variables.... 
             // @param: move, an array of length 2 [x, y] coordinates of the board
