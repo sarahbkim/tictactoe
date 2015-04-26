@@ -127,5 +127,134 @@ angular.module('tictactoeApp')
         
     };
 
+    // my attempt at a minimax algorithm implementation 
+    // for tictactoe in javascript
+    $scope.miniMax = {
+        COMPUTER_WIN : 1,
+        DRAW : 0,
+        HUMAN_WIN : -1,
+        myBest: {}, // var best = {'score': undefined, 'move': undefined};
+        reply: {},
+        board: [],
+        side: 'COMPUTER',
+        chooseMove : function(side) {
+            // check if game over
+            if($scope.gameOver) {
+                return myBest;
+            }
+
+            if(side=='COMPUTER') {
+                myBest.score = -2;
+            } else {
+                myBest.score = 2;
+            }
+
+            var moves = legalMoves(board);
+
+            for(var i=0;i<moves.length;i++) {
+                performMove(moves[i]);
+                reply = chooseMove(!side);
+                undoMove(moves[i]);
+                if(((side=='COMPUTER') && (reply.score > myBest.score)) || ((side=='HUMAN') && (reply.score < myBest.score))) {
+                    myBest.move = m;
+                    myBest.score = reply.score;
+                }
+            }
+            // return best move and score
+            return myBest; 
+        },
+        performMove: function(move)
+            // runs a move that modifies 'this' grid
+            // and updates the score for myBest or reply variables.... 
+            // @param: move, an array of length 2 [x, y] coordinates of the board
+            // evaluates the board 
+            this.board[move[0]][move[1]] = side;
+            evaluateBoard(this.board, move);
+        },
+        undoMove: function(move) {
+            // undoes the move so that it restores 'this' grid
+            // @param: move, an array of length 2 [x, y] coordinates of the board
+            this.board[move[0]][move[1]] = ' ';
+        },
+        legalMoves: function() {
+            // returns an array of [x, y] that is still open
+            var moves = [];
+            for(var i=0; i<this.board.length;i++) {
+                for(var j=0; j<this.board[i].length;j++){
+                    // if the slot is not filled yet... 
+                    if(this.board[i][j]==' '){
+                        moves.push([i, j]);
+                    };
+                }
+            }
+            return moves;
+        },
+        // needs to return move score: 0, 1, -1
+        evaluateBoard: function(lastMove) {
+            var self = this;
+            var x = lastMove[0],
+                y = lastMove[1];
+
+            var startPlayer = self.board[x][y];
+
+            // start boardTest inner obj
+            var boardTest = {
+                checkRow: function() {
+                    for(var i=0;i<self.board[this.x].length;i++) {
+                        if(board[this.x][i]!=this.startPlayer) {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                checkCol: function() {
+                    for(var i=0;i<self.board.length;i++) {
+                        if(board[i][this.y]!=startPlayer) {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                checkDiag: function() {
+                    if(self.board[0][0] != ' ') {
+                        if(self.board[0][0]== this.startPlayer && self.board[1][1] == this.startPlayer && self.board[2][2] == this.startPlayer) {
+                            return true;
+                        }
+                    } else if (self.board[0][2] != ' ') {
+                        if(self.board[0][2] == this.startPlayer && self.board[1][1] == this.startPlayer && self.board[2][0] == this.startPlayer) {
+                            return true;
+                        }
+                    } else {
+                        return false;
+                    }
+
+                }
+            };
+            // end boardTest inner obj
+
+            // do checks here... 
+            // if board is full with no winner, return draw 
+                self.myBest.score = 0; // what about 'reply?'
+            // return winner if found
+                self.myBest.score = 1;
+            // otherwise, don't change the best score
+
+            }
+        }
+
+    }
+
 
 }]);
+
+
+
+
+
+
+
+
+
+
+
+
