@@ -130,143 +130,153 @@ angular.module('tictactoeApp')
     // my attempt at a minimax algorithm implementation 
     // for tictactoe in javascript
     $scope.miniMax = {
-        COMPUTER_WIN : 1,
-        DRAW : 0,
-        HUMAN_WIN : -1,
-        myBest: {}, // var best = {'score': undefined, 'move': undefined};
-        reply: {},
-        board: [],
-        side: 'COMPUTER', // start with computer -- go to 'HUMAN' next... 
-        chooseMove : function() {
-            // check if game over
-            if(this.gameOver()) {
-                return this.myBest;
-            }
+    COMPUTER_WIN : 1,
+    DRAW : 0,
+    HUMAN_WIN : -1,
+    myBest: {}, // var best = {'score': undefined, 'move': undefined};
+    reply: {},
+    board: [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']],
+    side: 'COMPUTER',
+    winner: '',
+    chooseMove : function(side) {
+        var moves = this.legalMoves(this.board);
+        // check if game is over 
+        if(this.myBest.move && this.gameOver(this.myBest.move)) {
+            return this.myBest;
+        }
 
-            if(this.side=='COMPUTER') {
-                this.myBest.score = -2;
+        if(this.side=='COMPUTER') {
+            this.myBest.score = -2;
+        } else {
+            this.myBest.score = 2;
+        }
+
+        for(var i=0;i<moves.length;i++) {
+            this.performMove(moves[i]);
+            otherside = this.not(this.side);
+            this.reply = this.chooseMove(otherside);
+            this.undoMove(moves[i]);
+            if(((this.side=='COMPUTER') && (this.reply.score > this.myBest.score)) || ((this.side=='HUMAN') && (this.reply.score < this.myBest.score))) {
+                this.myBest.move = moves[i];
+                this.myBest.score = this.reply.score;
+            }
+        }
+        // return best move and score
+        return this.myBest; 
+    },
+    not: function(side) {
+        if(side=='COMPUTER') {
+            this.side = 'HUMAN';
+        } else {
+            this.side = 'COMPUTER';
+        }
+    },
+    performMove: function(move) {
+        // runs a move that modifies 'this' grid
+        // and updates the score for myBest or reply variables.... 
+        // @param: move, an array of length 2 [x, y] coordinates of the board
+        // evaluates the board 
+        this.board[move[0]][move[1]] = this.side;
+        this.evaluateBoard(move);
+    },
+    undoMove: function(move) {
+        // undoes the move so that it restores 'this' grid
+        // @param: move, an array of length 2 [x, y] coordinates of the board
+        this.board[move[0]][move[1]] = ' ';
+    },
+    legalMoves: function() {
+        // returns an array of [x, y] that is still open
+        var moves = [];
+        for(var i=0; i<this.board.length;i++) {
+            for(var j=0; j<this.board[i].length;j++){
+                // if the slot is not filled yet... 
+                if(this.board[i][j]==' '){
+                    moves.push([i, j]);
+                };
+            }
+        }
+        return moves;
+    },
+    gameOver: function(lastMove) {
+        var x = lastMove[0],
+            y = lastMove[1];
+
+        var startPlayer = this.board[x][y];    
+        // check if there is a winner: 
+        if(this.boardTest.checkRow(startPlayer, x, y, this.board) || this.boardTest.checkCol(startPlayer, x, y, this.board) || this.boardTest.checkDiag(startPlayer, x, y, this.board) ) {
+            this.winner = startPlayer;
+            return true;
+        }
+        // check if board empty
+        for(var i=0;i<this.board.length;i++) {
+            for(var j=0;j<this.board[i].length;j++){
+                // there are still empty slots to play
+                if(board[i][j]==' '){
+                    return false;
+                } 
+            }
+        }
+
+        // otherwise, board is full and there is no winner. 
+        this.winner = 'DRAW';
+        return true;
+    },
+    // needs to return move score: 0, 1, -1
+    evaluateBoard: function(lastMove) {
+        var self = this;
+        var x = lastMove[0],
+            y = lastMove[1];
+
+        var startPlayer = self.board[x][y];
+
+        // run the board tests and update the scores depending on side..
+        if(this.boardTest.checkRow(startPlayer, x, y, self.board) || this.boardTest.checkCol(startPlayer, x, y, self.board) || this.boardTest.checkDiag(startPlayer, x, y, self.board) ) {
+            if(self.side=='COMPUTER') {
+                self.myBest.score = self.COMPUTER_WIN;
             } else {
-                this.myBest.score = 2;
+                self.reply.score = self.HUMAN_WIN;
             }
+        } else {
+            if(self.side=='COMPUTER') {
+                self.myBest.score = self.DRAW;
+            } else {
+                self.reply.score = self.DRAW;
+            }
+        }
 
-            var moves = legalMoves(board);
-
-            for(var i=0;i<moves.length;i++) {
-                this.performMove(moves[i]);
-                this.reply = this.chooseMove(not(this.side));
-                this.undoMove(moves[i]);
-                if(((this.side=='COMPUTER') && (this.reply.score > this.myBest.score)) || ((this.side=='HUMAN') && (this.reply.score < this.myBest.score))) {
-                    this.myBest.move = moves[i];
-                    this.myBest.score = this.reply.score;
+    }, // end evaluateBoard() 
+    boardTest: {
+        checkRow: function(startPlayer, x, y, board) {
+            for(var i=0;i<board[x].length;i++) {
+                if(board[x][i]!=startPlayer) {
+                    return false;
                 }
             }
-            // return best move and score
-            return this.myBest; 
+            return true;
         },
-        not: function(side) {
-            if(side=='COMPUTER') {
-                this.side == 'HUMAN';
-            } else {
-                this.side == 'COMPUTER';
-            }
-        },
-        performMove: function(move) {
-            // runs a move that modifies 'this' grid
-            // and updates the score for myBest or reply variables.... 
-            // @param: move, an array of length 2 [x, y] coordinates of the board
-            // evaluates the board 
-            this.board[move[0]][move[1]] = side;
-            this.evaluateBoard(this.board, move);
-        },
-        undoMove: function(move) {
-            // undoes the move so that it restores 'this' grid
-            // @param: move, an array of length 2 [x, y] coordinates of the board
-            this.board[move[0]][move[1]] = ' ';
-        },
-        legalMoves: function() {
-            // returns an array of [x, y] that is still open
-            var moves = [];
-            for(var i=0; i<this.board.length;i++) {
-                for(var j=0; j<this.board[i].length;j++){
-                    // if the slot is not filled yet... 
-                    if(this.board[i][j]==' '){
-                        moves.push([i, j]);
-                    };
+        checkCol: function(startPlayer, x, y, board) {
+            for(var i=0;i<board.length;i++) {
+                if(board[i][y]!=startPlayer) {
+                    return false;
                 }
             }
-            return moves;
+            return true;
         },
-        // needs to return move score: 0, 1, -1
-        evaluateBoard: function(lastMove) {
-            var self = this;
-            var x = lastMove[0],
-                y = lastMove[1];
-
-            var startPlayer = self.board[x][y];
-
-            // start boardTest inner obj
-            var boardTest = {
-                checkRow: function() {
-                    for(var i=0;i<self.board[this.x].length;i++) {
-                        if(self.board[this.x][i]!=this.startPlayer) {
-                            return false;
-                        }
-                    }
+        checkDiag: function(startPlayer, x, y, board) {
+            if(board[0][0] != ' ') {
+                if(board[0][0]== startPlayer && board[1][1] == startPlayer && board[2][2] == startPlayer) {
                     return true;
-                },
-                checkCol: function() {
-                    for(var i=0;i<self.board.length;i++) {
-                        if(self.board[i][this.y]!=this.startPlayer) {
-                            return false;
-                        }
-                    }
-                    return true;
-                },
-                checkDiag: function() {
-                    if(self.board[0][0] != ' ') {
-                        if(self.board[0][0]== this.startPlayer && self.board[1][1] == this.startPlayer && self.board[2][2] == this.startPlayer) {
-                            return true;
-                        }
-                    } else if (self.board[0][2] != ' ') {
-                        if(self.board[0][2] == this.startPlayer && self.board[1][1] == this.startPlayer && self.board[2][0] == this.startPlayer) {
-                            return true;
-                        }
-                    } else {
-                        return false;
-                    }
                 }
-            }; // end boardTest object
-
-            // run the board tests and update the scores depending on side..
-            if(this.boardTest.checkRow() || this.boardTest.checkCol() || this.boardTest.checkDiag() ) {
-                if(self.side=='COMPUTER') {
-                    self.myBest.score = self.COMPUTER_WIN;
-                } else {
-                    self.reply.score = self.HUMAN_WIN;
+            } else if (board[0][2] != ' ') {
+                if(board[0][2] == startPlayer && board[1][1] == startPlayer && board[2][0] == startPlayer) {
+                    return true;
                 }
             } else {
-                if(self.side=='COMPUTER') {
-                    self.myBest.score = self.DRAW;
-                } else {
-                    self.reply.score = self.DRAW;
-                }
+                return false;
             }
-
-        } // end evaluateBoard() 
-
-    } // end $scope.miniMax object
+        }
+    } // end boardTest object
+} // end $scope.miniMax object
 
 
 }]);
-
-
-
-
-
-
-
-
-
-
-
-
